@@ -266,7 +266,7 @@ class SettlementAutomation(models.Model):
         return self._execute_external_query(query, (week_start, week_end))
 
     def _process_courier_settlements(self, orders, week_start, week_end):
-        """Process courier settlements from order data"""
+        """Process courier settlements from order data with auto-creation of missing couriers"""
         settlements = []
 
         # Group orders by courier
@@ -288,13 +288,11 @@ class SettlementAutomation(models.Model):
 
         # Create settlement records
         for external_courier_id, data in courier_data.items():
-            # Find courier in Odoo
-            courier = self.env['food.delivery.courier'].search([
-                ('external_courier_id', '=', external_courier_id)
-            ], limit=1)
+            # Find or create courier in Odoo
+            courier = self._find_or_create_courier(external_courier_id)
 
             if not courier:
-                _logger.warning(f"Courier {external_courier_id} not found in Odoo")
+                _logger.error(f"Failed to find or create courier {external_courier_id}")
                 continue
 
             # Calculate high volume vs regular deliveries
@@ -346,3 +344,58 @@ class SettlementAutomation(models.Model):
             settlements.append(settlement)
 
         return settlements
+
+    def _find_or_create_courier(self, external_courier_id):
+        """Find existing courier or create new one from external database"""
+        # Try to find existing courier
+        courier = self.env['food.delivery.courier'].search([
+            ('external_courier_id', '=', external_courier_id)
+        ], limit=1)
+
+        if courier:
+            return courier
+
+        # Fetch courier details from external database
+        courier_data = self._get_courier_details(external_courier_id)
+
+        if not courier_data:
+            _logger.error(f"Courier {external_courier_id} not found in external database")
+            return None
+
+        try:
+            # Create partner for courier
+            partner = self.env['res.partner'].sudo().create_courier_partner(
+                external_courier_id=external_courier_id,
+                name=courier_data['courier_full_name'],
+                phone=None,  # Add phone if available in external DB
+                email=None  # Add email if available in external DB
+            )
+
+            # Create courier record
+            courier = self.env['food.delivery.courier'].create({
+                'external_courier_id': external_courier_id,
+                'partner_id': partner.id
+            })
+
+            _logger.info(f"Auto-created courier: {courier.display_name}")
+            return courier
+
+        except Exception as e:
+            _logger.error(f"Failed to create courier {external_courier_id}: {e}")
+            return None
+
+    def _get_courier_details(self, external_courier_id):
+        """Get courier details from external database"""
+        query = """
+        SELECT 
+            courier_id,
+            courier_full_name,
+            courier_address,
+            date_of_birth,
+            gender
+        FROM couriers 
+        WHERE courier_id = %s
+        """
+
+        result = self._execute_external_query(query, (external_courier_id,))
+        return result[0] if result else None
