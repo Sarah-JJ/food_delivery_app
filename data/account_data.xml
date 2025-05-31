@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Chart of Accounts for Food Delivery -->
+
+        <!-- Assets -->
+        <record id="account_cash_delivery" model="account.account">
+            <field name="code">102000</field>
+            <field name="name">Cash - Delivery Operations</field>
+            <field name="account_type">asset_current</field>
+            <field name="reconcile">True</field>
+        </record>
+
+        <!-- Liabilities -->
+        <record id="account_payable_couriers" model="account.account">
+            <field name="code">202000</field>
+            <field name="name">Accounts Payable - Couriers</field>
+            <field name="account_type">liability_payable</field>
+            <field name="reconcile">True</field>
+        </record>
+
+        <record id="account_payable_restaurants" model="account.account">
+            <field name="code">203000</field>
+            <field name="name">Accounts Payable - Restaurants</field>
+            <field name="account_type">liability_payable</field>
+            <field name="reconcile">True</field>
+        </record>
+
+        <!-- Revenue -->
+        <record id="account_delivery_revenue" model="account.account">
+            <field name="code">401000</field>
+            <field name="name">Delivery Fee Revenue</field>
+            <field name="account_type">income</field>
+        </record>
+
+        <!-- Expenses -->
+        <record id="account_courier_expense" model="account.account">
+            <field name="code">501000</field>
+            <field name="name">Courier Commission Expense</field>
+            <field name="account_type">expense</field>
+        </record>
+
+        <record id="account_restaurant_expense" model="account.account">
+            <field name="code">502000</field>
+            <field name="name">Restaurant Payment Expense</field>
+            <field name="account_type">expense</field>
+        </record>
+
+        <!-- Payment Processing Fees -->
+        <record id="account_payment_fees" model="account.account">
+            <field name="code">503000</field>
+            <field name="name">Payment Processing Fees</field>
+            <field name="account_type">expense</field>
+        </record>
+
+        <!-- Journals -->
+        <record id="journal_delivery_operations" model="account.journal">
+            <field name="name">Delivery Operations</field>
+            <field name="code">DLVR</field>
+            <field name="type">general</field>
+            <field name="sequence">50</field>
+        </record>
+
+        <record id="journal_settlement" model="account.journal">
+            <field name="name">Settlement Journal</field>
+            <field name="code">SETT</field>
+            <field name="type">general</field>
+            <field name="sequence">51</field>
+        </record>
+
+    </data>
+</odoo>

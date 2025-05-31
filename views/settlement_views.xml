@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Courier Settlement Views -->
+        <record id="view_courier_settlement_tree" model="ir.ui.view">
+            <field name="name">courier.settlement.tree</field>
+            <field name="model">food.delivery.courier.settlement</field>
+            <field name="arch" type="xml">
+                <list create="false" edit="false" delete="false"
+                      decoration-info="state=='draft'" decoration-success="state=='paid'"
+                      decoration-warning="state=='confirmed'">
+                    <field name="name"/>
+                    <field name="courier_id"/>
+                    <field name="settlement_date"/>
+                    <field name="week_start"/>
+                    <field name="week_end"/>
+                    <field name="total_deliveries"/>
+                    <field name="total_amount_due"/>
+                    <field name="state"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_courier_settlement_form" model="ir.ui.view">
+            <field name="name">courier.settlement.form</field>
+            <field name="model">food.delivery.courier.settlement</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_confirm_settlement" type="object"
+                                string="Confirm Settlement" class="oe_highlight"
+                                invisible="[('state', '!=', 'draft')]"/>
+                        <button name="action_mark_paid" type="object"
+                                string="Mark as Paid" class="oe_highlight"
+                                invisible="[('state', '!=', 'confirmed')]"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="courier_id"/>
+                                <field name="settlement_date"/>
+                                <field name="week_start"/>
+                                <field name="week_end"/>
+                            </group>
+                            <group>
+                                <field name="total_deliveries"/>
+                                <field name="regular_deliveries"/>
+                                <field name="high_volume_deliveries"/>
+                                <field name="total_amount_due"/>
+                            </group>
+                        </group>
+                        <group string="Approval Information"
+                               invisible="[('state', '=', 'draft')]">
+                            <group>
+                                <field name="confirmed_by" readonly="1"/>
+                                <field name="confirmed_date" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="paid_by" readonly="1"/>
+                                <field name="paid_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Accounting" invisible="[('state', '=', 'draft')]">
+                            <group>
+                                <field name="vendor_bill_id" readonly="1"/>
+                                <field name="payment_id" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Settlement Lines">
+                                <field name="settlement_line_ids">
+                                    <list create="false" edit="false" delete="false" >
+                                        <field name="external_order_id"/>
+                                        <field name="delivery_date"/>
+                                        <field name="delivery_fee"/>
+                                        <field name="courier_share"/>
+                                        <field name="high_volume_bonus"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Restaurant Settlement Views -->
+        <record id="view_restaurant_settlement_tree" model="ir.ui.view">
+            <field name="name">restaurant.settlement.tree</field>
+            <field name="model">food.delivery.restaurant.settlement</field>
+            <field name="arch" type="xml">
+                <list create="false" edit="false" delete="false"  decoration-info="state=='draft'" decoration-success="state=='paid'"
+                      decoration-warning="state=='confirmed'">
+                    <field name="name"/>
+                    <field name="restaurant_id"/>
+                    <field name="settlement_date"/>
+                    <field name="week_start"/>
+                    <field name="week_end"/>
+                    <field name="total_orders"/>
+                    <field name="total_order_amount"/>
+                    <field name="total_delivery_fees"/>
+                    <field name="net_amount_due"/>
+                    <field name="state"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_restaurant_settlement_form" model="ir.ui.view">
+            <field name="name">restaurant.settlement.form</field>
+            <field name="model">food.delivery.restaurant.settlement</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_confirm_settlement" type="object"
+                                string="Confirm Settlement" class="oe_highlight"
+                                invisible="[('state', '!=', 'draft')]"/>
+                        <button name="action_mark_paid" type="object"
+                                string="Mark as Paid" class="oe_highlight"
+                                invisible="[('state', '!=', 'confirmed')]"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="restaurant_id"/>
+                                <field name="settlement_date"/>
+                                <field name="week_start"/>
+                                <field name="week_end"/>
+                            </group>
+                            <group>
+                                <field name="total_orders"/>
+                                <field name="total_order_amount"/>
+                                <field name="total_delivery_fees"/>
+                                <field name="net_amount_due"/>
+                            </group>
+                        </group>
+                        <group string="Approval Information" invisible="[('state', '=', 'draft')]">
+                            <group>
+                                <field name="confirmed_by" readonly="1"/>
+                                <field name="confirmed_date" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="paid_by" readonly="1"/>
+                                <field name="paid_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Accounting" invisible="[('state', '=', 'draft')]">
+                            <group>
+                                <field name="vendor_bill_id" readonly="1"/>
+                                <field name="payment_id" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Settlement Lines">
+                                <field name="settlement_line_ids">
+                                    <list create="false" edit="false" delete="false" >
+                                        <field name="external_order_id"/>
+                                        <field name="order_date"/>
+                                        <field name="order_amount"/>
+                                        <field name="delivery_fee"/>
+                                        <field name="net_amount"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Courier Views -->
+        <record id="view_courier_tree" model="ir.ui.view">
+            <field name="name">courier.tree</field>
+            <field name="model">food.delivery.courier</field>
+            <field name="arch" type="xml">
+                <list create="false" edit="false" delete="false" >
+                    <field name="display_name"/>
+                    <field name="external_courier_id"/>
+                    <field name="partner_id"/>
+                    <field name="active_deliveries_today"/>
+                    <field name="hourly_delivery_count"/>
+                    <field name="high_volume_active"/>
+                    <field name="total_settlements"/>
+                    <field name="total_amount_paid"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_courier_form" model="ir.ui.view">
+            <field name="name">courier.form</field>
+            <field name="model">food.delivery.courier</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="external_courier_id"/>
+                                <field name="partner_id"/>
+                            </group>
+                            <group>
+                                <field name="active_deliveries_today"/>
+                                <field name="hourly_delivery_count"/>
+                                <field name="high_volume_active"/>
+                                <field name="last_delivery_hour"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="total_settlements"/>
+                                <field name="total_amount_paid"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Settlements">
+                                <field name="settlement_ids">
+                                    <list create="false" edit="false" delete="false" >
+                                        <field name="name"/>
+                                        <field name="settlement_date"/>
+                                        <field name="total_deliveries"/>
+                                        <field name="total_amount_due"/>
+                                        <field name="state"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Fee Calculation Views -->
+        <record id="view_fee_calculation_tree" model="ir.ui.view">
+            <field name="name">fee.calculation.tree</field>
+            <field name="model">food.delivery.fee.calculation</field>
+            <field name="arch" type="xml">
+                <list create="false" edit="false" delete="false" >
+                    <field name="external_order_id"/>
+                    <field name="courier_id"/>
+                    <field name="distance_km"/>
+                    <field name="delivery_fee"/>
+                    <field name="company_share"/>
+                    <field name="courier_share"/>
+                    <field name="high_volume_bonus"/>
+                    <field name="calculation_date"/>
+                </list>
+            </field>
+        </record>
+
+
+        <!-- Actions -->
+        <record id="action_courier_settlement" model="ir.actions.act_window">
+            <field name="name">Courier Settlements</field>
+            <field name="res_model">food.delivery.courier.settlement</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first courier settlement!
+                </p>
+                <p>
+                    Courier settlements are generated automatically every Monday for the previous week.
+                    You can review, confirm and process payments here.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_restaurant_settlement" model="ir.actions.act_window">
+            <field name="name">Restaurant Settlements</field>
+            <field name="res_model">food.delivery.restaurant.settlement</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first restaurant settlement!
+                </p>
+                <p>
+                    Restaurant settlements are generated automatically every Monday for the previous week.
+                    You can review, confirm and process payments here.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_courier" model="ir.actions.act_window">
+            <field name="name">Couriers</field>
+            <field name="res_model">food.delivery.courier</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add your first courier!
+                </p>
+                <p>
+                    Couriers are automatically created when they are referenced in API calls.
+                    Here you can view their performance and settlement history.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_fee_calculation" model="ir.actions.act_window">
+            <field name="name">Fee Calculations</field>
+            <field name="res_model">food.delivery.fee.calculation</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No fee calculations yet!
+                </p>
+                <p>
+                    Fee calculations are created automatically when the mobile app requests
+                    delivery fee calculations through the API.
+                </p>
+            </field>
+        </record>
+
+        <!-- Menu Items -->
+        <menuitem id="menu_food_delivery_root" name="Food Delivery" sequence="10"/>
+
+        <menuitem id="menu_settlements" name="Settlements" parent="menu_food_delivery_root" sequence="10"/>
+
+        <menuitem id="menu_courier_settlements" name="Courier Settlements"
+                  parent="menu_settlements" sequence="10"
+                  action="action_courier_settlement"/>
+
+        <menuitem id="menu_restaurant_settlements" name="Restaurant Settlements"
+                  parent="menu_settlements" sequence="20"
+                  action="action_restaurant_settlement"/>
+
+        <menuitem id="menu_operations" name="Operations" parent="menu_food_delivery_root" sequence="20"/>
+
+        <menuitem id="menu_couriers" name="Couriers"
+                  parent="menu_operations" sequence="10"
+                  action="action_courier"/>
+
+        <menuitem id="menu_fee_calculations" name="Fee Calculations"
+                  parent="menu_operations" sequence="20"
+                  action="action_fee_calculation"/>
+
+    </data>
+</odoo>

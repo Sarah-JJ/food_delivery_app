@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_courier_all,food.delivery.courier.all,model_food_delivery_courier,base.group_user,1,1,1,1
+access_fee_calculation_all,food.delivery.fee.calculation.all,model_food_delivery_fee_calculation,base.group_user,1,1,1,0
+access_courier_settlement_all,food.delivery.courier.settlement.all,model_food_delivery_courier_settlement,base.group_user,1,1,1,0
+access_courier_settlement_line_all,food.delivery.courier.settlement.line.all,model_food_delivery_courier_settlement_line,base.group_user,1,1,1,0
+access_restaurant_settlement_all,food.delivery.restaurant.settlement.all,model_food_delivery_restaurant_settlement,base.group_user,1,1,1,0
+access_restaurant_settlement_line_all,food.delivery.restaurant.settlement.line.all,model_food_delivery_restaurant_settlement_line,base.group_user,1,1,1,0
+access_settlement_automation_all,settlement.automation.all,model_settlement_automation,base.group_user,1,1,1,0
+access_restaurant_settlement_automation_all,restaurant.settlement.automation.all,model_restaurant_settlement_automation,base.group_user,1,1,1,0

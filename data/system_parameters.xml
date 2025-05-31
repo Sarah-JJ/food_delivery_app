@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- External Database Configuration Parameters -->
+        <record id="param_external_db_host" model="ir.config_parameter">
+            <field name="key">external.db.host</field>
+            <field name="value">localhost</field>
+        </record>
+
+        <record id="param_external_db_name" model="ir.config_parameter">
+            <field name="key">external.db.name</field>
+            <field name="value">food_delivery_app</field>
+        </record>
+
+        <record id="param_external_db_user" model="ir.config_parameter">
+            <field name="key">external.db.user</field>
+            <field name="value">odoo_readonly</field>
+        </record>
+
+        <record id="param_external_db_password" model="ir.config_parameter">
+            <field name="key">external.db.password</field>
+            <field name="value">odoo_password</field>
+        </record>
+
+        <record id="param_external_db_port" model="ir.config_parameter">
+            <field name="key">external.db.port</field>
+            <field name="value">5432</field>
+        </record>
+
+        <!-- Business Rule Parameters -->
+        <record id="param_delivery_fee_under_5km" model="ir.config_parameter">
+            <field name="key">delivery.fee.under_5km</field>
+            <field name="value">2.0</field>
+        </record>
+
+        <record id="param_delivery_fee_5_to_7km" model="ir.config_parameter">
+            <field name="key">delivery.fee.5_to_7km</field>
+            <field name="value">3.0</field>
+        </record>
+
+        <record id="param_delivery_fee_over_7km" model="ir.config_parameter">
+            <field name="key">delivery.fee.over_7km</field>
+            <field name="value">5.0</field>
+        </record>
+
+        <record id="param_commission_company_normal" model="ir.config_parameter">
+            <field name="key">commission.company.normal</field>
+            <field name="value">40</field>
+        </record>
+
+        <record id="param_commission_courier_normal" model="ir.config_parameter">
+            <field name="key">commission.courier.normal</field>
+            <field name="value">60</field>
+        </record>
+
+        <record id="param_commission_company_high_volume" model="ir.config_parameter">
+            <field name="key">commission.company.high_volume</field>
+            <field name="value">35</field>
+        </record>
+
+        <record id="param_commission_courier_high_volume" model="ir.config_parameter">
+            <field name="key">commission.courier.high_volume</field>
+            <field name="value">65</field>
+        </record>
+
+        <record id="param_high_volume_threshold" model="ir.config_parameter">
+            <field name="key">high_volume.threshold</field>
+            <field name="value">5</field>
+        </record>
+
+        <!-- API Configuration -->
+        <record id="param_api_timeout" model="ir.config_parameter">
+            <field name="key">api.timeout</field>
+            <field name="value">30</field>
+        </record>
+
+        <record id="param_api_rate_limit" model="ir.config_parameter">
+            <field name="key">api.rate_limit</field>
+            <field name="value">100</field>
+        </record>
+
+    </data>
+</odoo>
