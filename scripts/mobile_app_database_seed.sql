@@ -40,7 +40,11 @@ CREATE TABLE orders (
     order_status VARCHAR(50) NOT NULL,
     items TEXT,
     delivery_location TEXT NOT NULL,
-    cost DECIMAL(10,2)
+    cost DECIMAL(10,2),
+    delivery_fee DECIMAL(10,2) DEFAULT 0,
+    courier_share DECIMAL(10,2) DEFAULT 0,
+    company_share DECIMAL(10,2) DEFAULT 0,
+    odoo_calculation_id INTEGER DEFAULT NULL
 );
 
 -- Insert sample data into customers table
@@ -68,12 +72,12 @@ INSERT INTO couriers (courier_full_name, courier_address, date_of_birth, gender)
 ('Yusuf Omar', '555 Dora St, Baghdad, Iraq', '1987-04-03', 'Male');
 
 -- Insert sample data into orders table
-INSERT INTO orders (customer_id, restaurant_id, courier_id, order_status, items, delivery_location, cost) VALUES
-(1, 1, 1, 'Delivered', 'Grilled Chicken, Rice, Salad', '123 Main St, Baghdad, Iraq', 25.50),
-(2, 2, 2, 'Delivered', 'Large Pizza Margherita, Coke', '456 Al-Rashid St, Baghdad, Iraq', 18.75),
-(3, 3, 3, 'Cancelled', 'Chicken Shawarma, Fries', '789 Haifa St, Baghdad, Iraq', 12.00),
-(4, 4, 4, 'Refunded', 'Burger Combo, Milkshake', '321 Karrada St, Baghdad, Iraq', 22.25),
-(5, 5, 5, 'Delivered', 'Mixed Grill, Hummus, Bread', '654 Mansour St, Baghdad, Iraq', 32.80);
+INSERT INTO orders (customer_id, restaurant_id, courier_id, order_status, items, delivery_location, cost, delivery_fee, courier_share, company_share, odoo_calculation_id) VALUES
+(1, 1, 1, 'delivered', 'Grilled Chicken, Rice, Salad', '123 Main St, Baghdad, Iraq', 25.50, 2.00, 1.20, 0.80, 1),
+(2, 2, 2, 'delivered', 'Large Pizza Margherita, Coke', '456 Al-Rashid St, Baghdad, Iraq', 18.75, 3.00, 1.80, 1.20, 2),
+(3, 3, 3, 'cancelled', 'Chicken Shawarma, Fries', '789 Haifa St, Baghdad, Iraq', 12.00, 5.00, 3.00, 2.00, 3),
+(4, 4, 4, 'refunded', 'Burger Combo, Milkshake', '321 Karrada St, Baghdad, Iraq', 22.25, 2.00, 1.20, 0.80, 4),
+(5, 5, 5, 'delivered', 'Mixed Grill, Hummus, Bread', '654 Mansour St, Baghdad, Iraq', 32.80, 3.00, 1.80, 1.20, 5);
 
 -- Create indexes for better performance
 CREATE INDEX idx_orders_customer_id ON orders(customer_id);
