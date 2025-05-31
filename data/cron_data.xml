@@ -4,9 +4,9 @@
         <!-- Cron job for weekly settlement generation -->
         <record id="cron_generate_settlements" model="ir.cron">
             <field name="name">Generate Weekly Settlements</field>
-            <field name="model_id" ref="food_delivery.model_settlement_automation"/>
+            <field name="model_id" ref="model_settlement_automation"/>
             <field name="state">code</field>
-            <field name="code">model.generate_weekly_settlements()</field>
+            <field name="code">env['settlement.automation'].generate_weekly_settlements()</field>
             <field name="interval_number">1</field>
             <field name="interval_type">weeks</field>
             <field name="nextcall"
@@ -21,7 +21,8 @@
             <field name="model_id" ref="food_delivery.model_restaurant_settlement_automation"/>
             <field name="state">code</field>
             <field name="code">
-                week_start = (datetime.now().date() - timedelta(days=datetime.now().weekday() + 7));week_end = week_start + timedelta(days=6);model.generate_restaurant_settlements(week_start, week_end)
+                week_start = (datetime.now().date() - timedelta(days=datetime.now().weekday() + 7));week_end =
+                week_start + timedelta(days=6);model.generate_restaurant_settlements(week_start, week_end)
             </field>
             <field name="interval_number">1</field>
             <field name="interval_type">weeks</field>
