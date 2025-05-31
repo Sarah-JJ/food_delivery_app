@@ -9,22 +9,22 @@
 
         <record id="param_external_db_name" model="ir.config_parameter">
             <field name="key">external.db.name</field>
-            <field name="value">food_delivery_app</field>
+            <field name="value">mobile_app_database</field>
         </record>
 
         <record id="param_external_db_user" model="ir.config_parameter">
             <field name="key">external.db.user</field>
-            <field name="value">odoo_readonly</field>
+            <field name="value">postgres</field>
         </record>
 
         <record id="param_external_db_password" model="ir.config_parameter">
             <field name="key">external.db.password</field>
-            <field name="value">odoo_password</field>
+            <field name="value">postgres</field>
         </record>
 
         <record id="param_external_db_port" model="ir.config_parameter">
             <field name="key">external.db.port</field>
-            <field name="value">5432</field>
+            <field name="value">5433</field>
         </record>
 
         <!-- Business Rule Parameters -->
