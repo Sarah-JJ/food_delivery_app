@@ -73,20 +73,17 @@ class CourierSettlement(models.Model):
 
     @api.model
     def create(self, vals):
-        """Override create to automatically generate vendor bill"""
         settlement = super().create(vals)
 
-        # Automatically create vendor bill upon settlement creation
+        # create vendor bill
         try:
             vendor_bill = settlement._create_vendor_bill()
             settlement.write({
                 'vendor_bill_id': vendor_bill.id,
-                'state': 'bill_created'
             })
-            _logger.info(f"Auto-created vendor bill {vendor_bill.name} for settlement {settlement.name}")
+            _logger.info(f"Created vendor bill {vendor_bill.name} for settlement {settlement.name}")
         except Exception as e:
             _logger.error(f"Failed to auto-create vendor bill for settlement {settlement.name}: {e}")
-            # Don't fail the settlement creation, but log the error
 
         return settlement
 
