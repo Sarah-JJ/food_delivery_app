@@ -11,8 +11,8 @@ This repository contains the technical implementation for integrating a food del
    ```scripts/mobile_app_database_seed.sql```
    
    This script creates the complete database schema and populates it with realistic sample data including.  
-   **IMPORTANT: if you will run the Settlement Creation cron manually, the created_at date of seeded orders table records has to be *before* last Monday** 
-2. Install odoo v18 including odoo enterprise modules, because the app depends on accounting
+   **IMPORTANT: if you will run the Settlement Creation cron manually, the created_at date of seeded orders table records has to be *between the last two Mondays*** 
+2. Install odoo v18, include odoo enterprise modules because the app depends on accounting
 3. Modify system parameters `param_external_db_host`, `param_external_db_name`, `param_external_db_user`, `param_external_db_password`, and `param_external_db_port` in `data/system_parameters.xml`
 4. Install modules: accounting, food_delivery
 
