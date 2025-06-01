@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 class CourierSettlement(models.Model):
     _name = 'food.delivery.courier.settlement'
     _description = 'Weekly Courier Settlement'
-    _order = 'settlement_date desc'
+    _order = 'create_date desc'
 
     name = fields.Char('Settlement Reference', compute='_compute_name', store=True)
     courier_id = fields.Many2one('food.delivery.courier', 'Courier', required=True)
@@ -354,8 +354,8 @@ class SettlementAutomation(models.Model):
             partner = self.env['res.partner'].sudo().create_courier_partner(
                 external_courier_id=external_courier_id,
                 name=courier_data['courier_full_name'],
-                phone=None,  # Add phone if available in external DB
-                email=None  # Add email if available in external DB
+                phone=None,
+                email=None
             )
 
             # Create courier record

@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 class RestaurantSettlement(models.Model):
     _name = 'food.delivery.restaurant.settlement'
     _description = 'Weekly Restaurant Settlement'
-    _order = 'settlement_date desc'
+    _order = 'create_date desc'
 
     name = fields.Char('Settlement Reference', compute='_compute_name', store=True)
     restaurant_id = fields.Many2one('res.partner', 'Restaurant',
