@@ -8,6 +8,7 @@
             <field name="model">food.delivery.courier.settlement</field>
             <field name="arch" type="xml">
                 <list create="false" edit="false" delete="false">
+                    <field name="create_date"/>
                     <field name="name"/>
                     <field name="courier_id"/>
                     <field name="settlement_date"/>
@@ -74,10 +75,6 @@
                                 <field name="vendor_bill_id" readonly="1"/>
                                 <field name="vendor_bill_state" readonly="1"/>
                                 <field name="payment_state" readonly="1"/>
-                            </group>
-                            <group>
-                                <field name="can_be_paid" readonly="1"/>
-                                <field name="is_paid" readonly="1"/>
                             </group>
                         </group>
                         <notebook>
@@ -172,10 +169,6 @@
                                 <field name="vendor_bill_id" readonly="1"/>
                                 <field name="vendor_bill_state" readonly="1"/>
                                 <field name="payment_state" readonly="1"/>
-                            </group>
-                            <group>
-                                <field name="can_be_paid" readonly="1"/>
-                                <field name="is_paid" readonly="1"/>
                             </group>
                         </group>
                         <notebook>

@@ -43,10 +43,6 @@ class RestaurantSettlement(models.Model):
     settlement_line_ids = fields.One2many('food.delivery.restaurant.settlement.line',
                                           'settlement_id', 'Settlement Lines', readonly=True)
 
-    # Computed fields for better visibility
-    can_be_paid = fields.Boolean('Can Be Paid', compute='_compute_payment_status')
-    is_paid = fields.Boolean('Is Paid', compute='_compute_payment_status')
-
     @api.depends('restaurant_id', 'week_start', 'week_end')
     def _compute_name(self):
         for record in self:
