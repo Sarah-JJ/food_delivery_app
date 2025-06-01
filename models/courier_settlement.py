@@ -138,7 +138,6 @@ class CourierSettlement(models.Model):
             }))
 
         vendor_bill = self.env['account.move'].create(bill_vals)
-        vendor_bill.action_post()
 
         return vendor_bill
 
