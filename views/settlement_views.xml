@@ -8,8 +8,8 @@
             <field name="model">food.delivery.courier.settlement</field>
             <field name="arch" type="xml">
                 <list create="false" edit="false" delete="false"
-                      decoration-info="state=='draft'" decoration-success="state=='paid'"
-                      decoration-warning="state=='confirmed'">
+                      decoration-info="state=='generated'" decoration-muted="state=='bill_created'"
+                      decoration-success="state=='paid'" decoration-danger="state=='cancelled'">
                     <field name="name"/>
                     <field name="courier_id"/>
                     <field name="settlement_date"/>
@@ -17,6 +17,8 @@
                     <field name="week_end"/>
                     <field name="total_deliveries"/>
                     <field name="total_amount_due"/>
+                    <field name="vendor_bill_state" optional="show"/>
+                    <field name="payment_state" optional="show"/>
                     <field name="state"/>
                 </list>
             </field>
@@ -26,17 +28,24 @@
             <field name="name">courier.settlement.form</field>
             <field name="model">food.delivery.courier.settlement</field>
             <field name="arch" type="xml">
-                <form>
+                <form create="false" edit="false" delete="false">
                     <header>
-                        <button name="action_confirm_settlement" type="object"
-                                string="Confirm Settlement" class="oe_highlight"
-                                invisible="[('state', '!=', 'draft')]"/>
-                        <button name="action_mark_paid" type="object"
-                                string="Mark as Paid" class="oe_highlight"
-                                invisible="[('state', '!=', 'confirmed')]"/>
-                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+                        <button name="action_view_vendor_bill" type="object"
+                                string="View Vendor Bill" class="oe_highlight"
+                                invisible="[('vendor_bill_id', '=', False)]"/>
+                        <field name="state" widget="statusbar" statusbar_visible="generated,bill_created,paid"/>
                     </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_vendor_bill" type="object"
+                                    class="oe_stat_button" icon="fa-file-text-o"
+                                    invisible="[('vendor_bill_id', '=', False)]">
+                                <field name="vendor_bill_state" widget="label"/>
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_text">Vendor Bill</span>
+                                </div>
+                            </button>
+                        </div>
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
@@ -56,27 +65,27 @@
                                 <field name="total_amount_due"/>
                             </group>
                         </group>
-                        <group string="Approval Information"
-                               invisible="[('state', '=', 'draft')]">
+                        <group string="Creation Information">
                             <group>
-                                <field name="confirmed_by" readonly="1"/>
-                                <field name="confirmed_date" readonly="1"/>
-                            </group>
-                            <group>
-                                <field name="paid_by" readonly="1"/>
-                                <field name="paid_date" readonly="1"/>
+                                <field name="created_by" readonly="1"/>
+                                <field name="created_date" readonly="1"/>
                             </group>
                         </group>
-                        <group string="Accounting" invisible="[('state', '=', 'draft')]">
+                        <group string="Vendor Bill Information" invisible="[('vendor_bill_id', '=', False)]">
                             <group>
                                 <field name="vendor_bill_id" readonly="1"/>
-                                <field name="payment_id" readonly="1"/>
+                                <field name="vendor_bill_state" readonly="1"/>
+                                <field name="payment_state" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="can_be_paid" readonly="1"/>
+                                <field name="is_paid" readonly="1"/>
                             </group>
                         </group>
                         <notebook>
                             <page string="Settlement Lines">
-                                <field name="settlement_line_ids">
-                                    <list create="false" edit="false" delete="false" >
+                                <field name="settlement_line_ids" readonly="1">
+                                    <list create="false" edit="false" delete="false">
                                         <field name="external_order_id"/>
                                         <field name="delivery_date"/>
                                         <field name="delivery_fee"/>
@@ -96,8 +105,9 @@
             <field name="name">restaurant.settlement.tree</field>
             <field name="model">food.delivery.restaurant.settlement</field>
             <field name="arch" type="xml">
-                <list create="false" edit="false" delete="false"  decoration-info="state=='draft'" decoration-success="state=='paid'"
-                      decoration-warning="state=='confirmed'">
+                <list create="false" edit="false" delete="false"
+                      decoration-info="state=='generated'" decoration-muted="state=='bill_created'"
+                      decoration-success="state=='paid'" decoration-danger="state=='cancelled'">
                     <field name="name"/>
                     <field name="restaurant_id"/>
                     <field name="settlement_date"/>
@@ -107,6 +117,8 @@
                     <field name="total_order_amount"/>
                     <field name="total_delivery_fees"/>
                     <field name="net_amount_due"/>
+                    <field name="vendor_bill_state" optional="show"/>
+                    <field name="payment_state" optional="show"/>
                     <field name="state"/>
                 </list>
             </field>
@@ -116,17 +128,24 @@
             <field name="name">restaurant.settlement.form</field>
             <field name="model">food.delivery.restaurant.settlement</field>
             <field name="arch" type="xml">
-                <form>
+                <form create="false" edit="false" delete="false">
                     <header>
-                        <button name="action_confirm_settlement" type="object"
-                                string="Confirm Settlement" class="oe_highlight"
-                                invisible="[('state', '!=', 'draft')]"/>
-                        <button name="action_mark_paid" type="object"
-                                string="Mark as Paid" class="oe_highlight"
-                                invisible="[('state', '!=', 'confirmed')]"/>
-                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid"/>
+                        <button name="action_view_vendor_bill" type="object"
+                                string="View Vendor Bill" class="oe_highlight"
+                                invisible="[('vendor_bill_id', '=', False)]"/>
+                        <field name="state" widget="statusbar" statusbar_visible="generated,bill_created,paid"/>
                     </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_vendor_bill" type="object"
+                                    class="oe_stat_button" icon="fa-file-text-o"
+                                    invisible="[('vendor_bill_id', '=', False)]">
+                                <field name="vendor_bill_state" widget="label"/>
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_text">Vendor Bill</span>
+                                </div>
+                            </button>
+                        </div>
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
@@ -146,26 +165,27 @@
                                 <field name="net_amount_due"/>
                             </group>
                         </group>
-                        <group string="Approval Information" invisible="[('state', '=', 'draft')]">
+                        <group string="Creation Information">
                             <group>
-                                <field name="confirmed_by" readonly="1"/>
-                                <field name="confirmed_date" readonly="1"/>
-                            </group>
-                            <group>
-                                <field name="paid_by" readonly="1"/>
-                                <field name="paid_date" readonly="1"/>
+                                <field name="created_by" readonly="1"/>
+                                <field name="created_date" readonly="1"/>
                             </group>
                         </group>
-                        <group string="Accounting" invisible="[('state', '=', 'draft')]">
+                        <group string="Vendor Bill Information" invisible="[('vendor_bill_id', '=', False)]">
                             <group>
                                 <field name="vendor_bill_id" readonly="1"/>
-                                <field name="payment_id" readonly="1"/>
+                                <field name="vendor_bill_state" readonly="1"/>
+                                <field name="payment_state" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="can_be_paid" readonly="1"/>
+                                <field name="is_paid" readonly="1"/>
                             </group>
                         </group>
                         <notebook>
                             <page string="Settlement Lines">
-                                <field name="settlement_line_ids">
-                                    <list create="false" edit="false" delete="false" >
+                                <field name="settlement_line_ids" readonly="1">
+                                    <list create="false" edit="false" delete="false">
                                         <field name="external_order_id"/>
                                         <field name="order_date"/>
                                         <field name="order_amount"/>
@@ -185,7 +205,7 @@
             <field name="name">courier.tree</field>
             <field name="model">food.delivery.courier</field>
             <field name="arch" type="xml">
-                <list create="false" edit="false" delete="false" >
+                <list create="false" edit="false" delete="false">
                     <field name="display_name"/>
                     <field name="external_courier_id"/>
                     <field name="partner_id"/>
@@ -202,7 +222,7 @@
             <field name="name">courier.form</field>
             <field name="model">food.delivery.courier</field>
             <field name="arch" type="xml">
-                <form>
+                <form create="false" edit="false" delete="false">
                     <sheet>
                         <div class="oe_title">
                             <h1>
@@ -229,12 +249,14 @@
                         </group>
                         <notebook>
                             <page string="Settlements">
-                                <field name="settlement_ids">
-                                    <list create="false" edit="false" delete="false" >
+                                <field name="settlement_ids" readonly="1">
+                                    <list create="false" edit="false" delete="false">
                                         <field name="name"/>
                                         <field name="settlement_date"/>
                                         <field name="total_deliveries"/>
                                         <field name="total_amount_due"/>
+                                        <field name="vendor_bill_state"/>
+                                        <field name="payment_state"/>
                                         <field name="state"/>
                                     </list>
                                 </field>
@@ -250,7 +272,7 @@
             <field name="name">fee.calculation.tree</field>
             <field name="model">food.delivery.fee.calculation</field>
             <field name="arch" type="xml">
-                <list create="false" edit="false" delete="false" >
+                <list create="false" edit="false" delete="false">
                     <field name="external_order_id"/>
                     <field name="courier_id"/>
                     <field name="distance_km"/>
@@ -263,7 +285,6 @@
             </field>
         </record>
 
-
         <!-- Actions -->
         <record id="action_courier_settlement" model="ir.actions.act_window">
             <field name="name">Courier Settlements</field>
@@ -272,11 +293,12 @@
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    Create your first courier settlement!
+                    No courier settlements yet!
                 </p>
                 <p>
                     Courier settlements are generated automatically every Monday for the previous week.
-                    You can review, confirm and process payments here.
+                    Vendor bills are created automatically with each settlement.
+                    Use the Vendor Bills menu to process payments.
                 </p>
             </field>
         </record>
@@ -288,11 +310,12 @@
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    Create your first restaurant settlement!
+                    No restaurant settlements yet!
                 </p>
                 <p>
                     Restaurant settlements are generated automatically every Monday for the previous week.
-                    You can review, confirm and process payments here.
+                    Vendor bills are created automatically with each settlement.
+                    Use the Vendor Bills menu to process payments.
                 </p>
             </field>
         </record>
@@ -329,6 +352,24 @@
             </field>
         </record>
 
+        <!-- Action for Vendor Bills related to Food Delivery -->
+        <record id="action_vendor_bills_food_delivery" model="ir.actions.act_window">
+            <field name="name">Vendor Bills - Food Delivery</field>
+            <field name="res_model">account.move</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('move_type', '=', 'in_invoice'), ('ref', 'ilike', 'Settlement')]</field>
+            <field name="context">{'default_move_type': 'in_invoice'}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No vendor bills yet!
+                </p>
+                <p>
+                    Vendor bills are automatically created when settlements are generated.
+                    Here you can review, validate, and process payments to couriers and restaurants.
+                </p>
+            </field>
+        </record>
+
         <!-- Menu Items -->
         <menuitem id="menu_food_delivery_root" name="Food Delivery" sequence="10"/>
 
@@ -341,6 +382,12 @@
         <menuitem id="menu_restaurant_settlements" name="Restaurant Settlements"
                   parent="menu_settlements" sequence="20"
                   action="action_restaurant_settlement"/>
+
+        <menuitem id="menu_finance" name="Finance" parent="menu_food_delivery_root" sequence="15"/>
+
+        <menuitem id="menu_vendor_bills_food_delivery" name="Vendor Bills"
+                  parent="menu_finance" sequence="10"
+                  action="action_vendor_bills_food_delivery"/>
 
         <menuitem id="menu_operations" name="Operations" parent="menu_food_delivery_root" sequence="20"/>
 

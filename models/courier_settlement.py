@@ -25,26 +25,30 @@ class CourierSettlement(models.Model):
     high_volume_deliveries = fields.Integer('High Volume Deliveries')
     regular_deliveries = fields.Integer('Regular Deliveries')
 
-    # Workflow states
+    # Workflow states - simplified to track vendor bill status
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('confirmed', 'Confirmed'),
+        ('generated', 'Settlement Generated'),
+        ('bill_created', 'Vendor Bill Created'),
         ('paid', 'Paid'),
         ('cancelled', 'Cancelled')
-    ], default='draft', required=True, tracking=True)
+    ], default='generated', required=True, tracking=True, readonly=True)
 
-    # Approval tracking
-    confirmed_by = fields.Many2one('res.users', 'Confirmed By', readonly=True)
-    confirmed_date = fields.Datetime('Confirmation Date', readonly=True)
-    paid_by = fields.Many2one('res.users', 'Paid By', readonly=True)
-    paid_date = fields.Datetime('Payment Date', readonly=True)
+    # Creation tracking
+    created_by = fields.Many2one('res.users', 'Created By', readonly=True, default=lambda self: self.env.user)
+    created_date = fields.Datetime('Creation Date', readonly=True, default=fields.Datetime.now)
 
     # Vendor bill integration
     vendor_bill_id = fields.Many2one('account.move', 'Vendor Bill', readonly=True)
-    payment_id = fields.Many2one('account.payment', 'Payment Record', readonly=True)
+    vendor_bill_state = fields.Selection(related='vendor_bill_id.state', string='Bill Status', readonly=True)
+    payment_state = fields.Selection(related='vendor_bill_id.payment_state', string='Payment Status', readonly=True)
 
     # Settlement lines
-    settlement_line_ids = fields.One2many('food.delivery.courier.settlement.line', 'settlement_id', 'Settlement Lines')
+    settlement_line_ids = fields.One2many('food.delivery.courier.settlement.line', 'settlement_id', 'Settlement Lines',
+                                          readonly=True)
+
+    # Computed fields for better visibility
+    can_be_paid = fields.Boolean('Can Be Paid', compute='_compute_payment_status')
+    is_paid = fields.Boolean('Is Paid', compute='_compute_payment_status')
 
     @api.depends('courier_id', 'week_start', 'week_end')
     def _compute_name(self):
@@ -54,56 +58,55 @@ class CourierSettlement(models.Model):
             else:
                 record.name = "New Settlement"
 
-    def action_confirm_settlement(self):
-        """Finance team confirms settlement and creates vendor bill"""
-        if self.state != 'draft':
-            raise UserError('Only draft settlements can be confirmed')
+    @api.depends('vendor_bill_id.state', 'vendor_bill_id.payment_state')
+    def _compute_payment_status(self):
+        for record in self:
+            if record.vendor_bill_id:
+                record.can_be_paid = record.vendor_bill_id.state == 'posted' and record.vendor_bill_id.payment_state in [
+                    'not_paid', 'partial']
+                record.is_paid = record.vendor_bill_id.payment_state == 'paid'
 
-        # Create vendor bill
-        vendor_bill = self._create_vendor_bill()
+                # Update settlement state based on vendor bill status
+                if record.is_paid and record.state != 'paid':
+                    record.state = 'paid'
+                elif record.vendor_bill_id.state == 'cancel' and record.state != 'cancelled':
+                    record.state = 'cancelled'
+            else:
+                record.can_be_paid = False
+                record.is_paid = False
 
-        self.write({
-            'state': 'confirmed',
-            'confirmed_by': self.env.user.id,
-            'confirmed_date': fields.Datetime.now(),
-            'vendor_bill_id': vendor_bill.id
-        })
+    @api.model
+    def create(self, vals):
+        """Override create to automatically generate vendor bill"""
+        settlement = super().create(vals)
 
-        return True
+        # Automatically create vendor bill upon settlement creation
+        try:
+            vendor_bill = settlement._create_vendor_bill()
+            settlement.write({
+                'vendor_bill_id': vendor_bill.id,
+                'state': 'bill_created'
+            })
+            _logger.info(f"Auto-created vendor bill {vendor_bill.name} for settlement {settlement.name}")
+        except Exception as e:
+            _logger.error(f"Failed to auto-create vendor bill for settlement {settlement.name}: {e}")
+            # Don't fail the settlement creation, but log the error
 
-    def action_mark_paid(self):
-        """Register payment for vendor bill"""
-        if self.state != 'confirmed' or not self.vendor_bill_id:
-            raise UserError('Settlement must be confirmed with vendor bill before payment')
+        return settlement
 
-        # Create payment for vendor bill
-        payment = self.env['account.payment'].create({
-            'payment_type': 'outbound',
-            'partner_type': 'supplier',
-            'partner_id': self.courier_id.partner_id.id,
-            'amount': self.total_amount_due,
-            'journal_id': self._get_cash_journal().id,
-            'ref': f'Payment - {self.vendor_bill_id.ref or self.name}'
-        })
+    def action_view_vendor_bill(self):
+        """Action to view the related vendor bill"""
+        if not self.vendor_bill_id:
+            raise UserError('No vendor bill associated with this settlement')
 
-        payment.action_post()
-
-        # Reconcile payment with vendor bill
-        if self.vendor_bill_id.state == 'posted':
-            lines_to_reconcile = payment.line_ids + self.vendor_bill_id.line_ids
-            lines_to_reconcile = lines_to_reconcile.filtered(
-                lambda l: l.account_id == payment.destination_account_id and not l.reconciled
-            )
-            lines_to_reconcile.reconcile()
-
-        self.write({
-            'state': 'paid',
-            'payment_id': payment.id,
-            'paid_by': self.env.user.id,
-            'paid_date': fields.Datetime.now()
-        })
-
-        return True
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+            'res_id': self.vendor_bill_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {'default_move_type': 'in_invoice'}
+        }
 
     def _create_vendor_bill(self):
         """Create vendor bill for courier payment"""
@@ -157,17 +160,6 @@ class CourierSettlement(models.Model):
                 ('account_type', '=', 'expense')
             ], limit=1)
         return account
-
-    def _get_cash_journal(self):
-        """Get cash journal for payments"""
-        journal = self.env['account.journal'].search([
-            ('type', '=', 'cash')
-        ], limit=1)
-        if not journal:
-            journal = self.env['account.journal'].search([
-                ('type', '=', 'bank')
-            ], limit=1)
-        return journal
 
 
 class CourierSettlementLine(models.Model):
@@ -241,7 +233,7 @@ class SettlementAutomation(models.Model):
             # Process courier settlements
             courier_settlements = self._process_courier_settlements(delivered_orders, week_start, week_end)
 
-            _logger.info(f"Generated {len(courier_settlements)} courier settlements")
+            _logger.info(f"Generated {len(courier_settlements)} courier settlements with auto-created vendor bills")
 
         except Exception as e:
             _logger.error(f"Error generating settlements: {e}")
@@ -286,7 +278,7 @@ class SettlementAutomation(models.Model):
             courier_data[courier_id]['total_deliveries'] += 1
             courier_data[courier_id]['orders'].append(order)
 
-        # Create settlement records
+        # Create settlement records (vendor bills will be auto-created)
         for external_courier_id, data in courier_data.items():
             # Find or create courier in Odoo
             courier = self._find_or_create_courier(external_courier_id)
@@ -310,7 +302,7 @@ class SettlementAutomation(models.Model):
                 else:
                     regular_count += 1
 
-            # Create settlement
+            # Create settlement (this will auto-create vendor bill)
             settlement = self.env['food.delivery.courier.settlement'].create({
                 'courier_id': courier.id,
                 'week_start': week_start,
@@ -320,7 +312,6 @@ class SettlementAutomation(models.Model):
                 'total_amount_due': data['total_amount'],
                 'regular_deliveries': regular_count,
                 'high_volume_deliveries': high_volume_count,
-                'state': 'draft'
             })
 
             # Create settlement lines
