@@ -26,7 +26,7 @@ class FoodDeliveryCourier(models.Model):
     def _compute_display_name(self):
         for record in self:
             if record.partner_id:
-                record.display_name = f"{record.partner_id.name} (#{record.external_courier_id})"
+                record.display_name = f"{record.partner_id.name}"
             else:
                 record.display_name = f"Courier #{record.external_courier_id}"
 
