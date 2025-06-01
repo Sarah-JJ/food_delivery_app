@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Cron job for weekly settlement generation -->
+        <!-- Single unified cron job for weekly settlement generation -->
         <record id="cron_generate_settlements" model="ir.cron">
             <field name="name">Generate Weekly Settlements</field>
             <field name="model_id" ref="model_settlement_automation"/>
@@ -15,26 +15,10 @@
             <field name="user_id" ref="base.user_admin"/>
         </record>
 
-        <!-- Cron job for restaurant settlements -->
-        <record id="cron_generate_restaurant_settlements" model="ir.cron">
-            <field name="name">Generate Weekly Restaurant Settlements</field>
-            <field name="model_id" ref="food_delivery.model_restaurant_settlement_automation"/>
-            <field name="state">code</field>
-            <field name="code">
-                week_start = (datetime.now().date() - timedelta(days=datetime.now().weekday() + 7));week_end = week_start + timedelta(days=6);model.generate_restaurant_settlements(week_start, week_end)
-            </field>
-            <field name="interval_number">1</field>
-            <field name="interval_type">weeks</field>
-            <field name="nextcall"
-                   eval="(datetime.now() + timedelta(days=(7-datetime.now().weekday()))).replace(hour=9, minute=30, second=0)"/>
-            <field name="active" eval="True"/>
-            <field name="user_id" ref="base.user_admin"/>
-        </record>
-
         <!-- Cron job to reset daily courier counts -->
         <record id="cron_reset_courier_counts" model="ir.cron">
             <field name="name">Reset Daily Courier Counts</field>
-            <field name="model_id" ref="food_delivery.model_food_delivery_courier"/>
+            <field name="model_id" ref="model_food_delivery_courier"/>
             <field name="state">code</field>
             <field name="code">model.reset_all_daily_counts()</field>
             <field name="interval_number">1</field>

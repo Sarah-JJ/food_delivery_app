@@ -33,11 +33,7 @@ class ResPartner(models.Model):
         ('scooter', 'Scooter')
     ], string='Vehicle Type')
 
-    # Settlement tracking
-    courier_settlement_ids = fields.One2many('food.delivery.courier.settlement', 'courier_id',
-                                             string='Courier Settlements')
-    restaurant_settlement_ids = fields.One2many('food.delivery.restaurant.settlement', 'restaurant_id',
-                                                string='Restaurant Settlements')
+    settlement_ids = fields.One2many('food.delivery.settlement', 'partner_id', 'Settlements')
 
     @api.model
     def create_courier_partner(self, external_courier_id, name, phone=None, email=None):
@@ -84,9 +80,9 @@ class ResPartner(models.Model):
     def get_settlement_summary(self):
         """Get settlement summary for partner"""
         if self.partner_type == 'courier':
-            settlements = self.courier_settlement_ids
+            settlements = self.settlement_ids.filtered(lambda s: s.partner_type == 'courier')
             total_amount = sum(settlements.mapped('total_amount_due'))
-            total_deliveries = sum(settlements.mapped('total_deliveries'))
+            total_deliveries = sum(settlements.mapped('total_orders'))
             return {
                 'total_settlements': len(settlements),
                 'total_amount': total_amount,
@@ -94,9 +90,9 @@ class ResPartner(models.Model):
                 'avg_per_delivery': total_amount / total_deliveries if total_deliveries else 0
             }
         elif self.partner_type == 'restaurant':
-            settlements = self.restaurant_settlement_ids
+            settlements = self.settlement_ids.filtered(lambda s: s.partner_type == 'restaurant')
             total_orders = sum(settlements.mapped('total_orders'))
-            total_amount = sum(settlements.mapped('net_amount_due'))
+            total_amount = sum(settlements.mapped('total_amount_due'))
             return {
                 'total_settlements': len(settlements),
                 'total_orders': total_orders,

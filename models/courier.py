@@ -18,7 +18,9 @@ class FoodDeliveryCourier(models.Model):
     high_volume_active = fields.Boolean('High Volume Bonus Active', default=False)
 
     # Settlement tracking
-    settlement_ids = fields.One2many('food.delivery.courier.settlement', 'courier_id', 'Settlements')
+    # In models/courier.py, update line:
+    settlement_ids = fields.One2many('food.delivery.settlement', 'partner_id', 'Settlements',
+                                     domain=[('partner_type', '=', 'courier')])
     total_settlements = fields.Integer('Total Settlements', compute='_compute_totals')
     total_amount_paid = fields.Float('Total Amount Paid', compute='_compute_totals')
 
