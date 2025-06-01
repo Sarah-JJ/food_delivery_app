@@ -70,21 +70,18 @@ class CourierSettlement(models.Model):
             else:
                 record.state = 'awaiting_payment'
 
-    @api.model
-    def create(self, vals):
-        settlement = super().create(vals)
-
-        # create vendor bill
+    def create_vendor_bill_after_lines(self):
+        """Create vendor bill after settlement lines are populated"""
         try:
-            vendor_bill = settlement._create_vendor_bill()
-            settlement.write({
+            vendor_bill = self._create_vendor_bill()
+            self.write({
                 'vendor_bill_id': vendor_bill.id,
             })
-            _logger.info(f"Created vendor bill {vendor_bill.name} for settlement {settlement.name}")
+            _logger.info(f"Created vendor bill {vendor_bill.name} for settlement {self.name}")
+            return vendor_bill
         except Exception as e:
-            _logger.error(f"Failed to auto-create vendor bill for settlement {settlement.name}: {e}")
-
-        return settlement
+            _logger.error(f"Failed to auto-create vendor bill for settlement {self.name}: {e}")
+            return None
 
     def action_view_vendor_bill(self):
         """Action to view the related vendor bill"""
@@ -323,6 +320,7 @@ class SettlementAutomation(models.Model):
                     'high_volume_bonus': high_volume_bonus
                 })
 
+            settlement.create_vendor_bill_after_lines()
             settlements.append(settlement)
 
         return settlements
