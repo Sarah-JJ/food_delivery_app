@@ -29,20 +29,13 @@
             <field name="arch" type="xml">
                 <form create="false" edit="false" delete="false">
                     <header>
-                        <button name="action_view_vendor_bill" type="object"
-                                string="View Vendor Bill" class="oe_highlight"
-                                invisible="[('vendor_bill_id', '=', False)]"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
                             <button name="action_view_vendor_bill" type="object"
-                                    class="oe_stat_button" icon="fa-file-text-o"
-                                    invisible="[('vendor_bill_id', '=', False)]">
-                                <field name="vendor_bill_state" widget="label"/>
-                                <div class="o_field_widget o_stat_info">
-                                    <span class="o_stat_text">Vendor Bill</span>
-                                </div>
+                                    class="oe_stat_button" icon="fa-file-text-o">
+                                <field name="vendor_bill_count" widget="statinfo" string="Vendor Bills"/>
                             </button>
                         </div>
                         <div class="oe_title">
@@ -131,12 +124,8 @@
                     <sheet>
                         <div class="oe_button_box" name="button_box">
                             <button name="action_view_vendor_bill" type="object"
-                                    class="oe_stat_button" icon="fa-file-text-o"
-                                    invisible="[('vendor_bill_id', '=', False)]">
-                                <field name="vendor_bill_state" widget="label"/>
-                                <div class="o_field_widget o_stat_info">
-                                    <span class="o_stat_text">Vendor Bill</span>
-                                </div>
+                                    class="oe_stat_button" icon="fa-file-text-o">
+                                <field name="vendor_bill_count" widget="statinfo" string="Vendor Bills"/>
                             </button>
                         </div>
                         <div class="oe_title">

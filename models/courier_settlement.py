@@ -44,6 +44,13 @@ class CourierSettlement(models.Model):
     settlement_line_ids = fields.One2many('food.delivery.courier.settlement.line', 'settlement_id', 'Settlement Lines',
                                           readonly=True)
 
+    vendor_bill_count = fields.Integer('Vendor Bill Count', compute='_compute_vendor_bill_count')
+
+    @api.depends('vendor_bill_id')
+    def _compute_vendor_bill_count(self):
+        for record in self:
+            record.vendor_bill_count = 1 if record.vendor_bill_id else 0
+
     @api.depends('courier_id', 'week_start', 'week_end')
     def _compute_name(self):
         for record in self:
