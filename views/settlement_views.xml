@@ -17,7 +17,6 @@
                     <field name="total_deliveries"/>
                     <field name="total_amount_due"/>
                     <field name="vendor_bill_state" optional="show"/>
-                    <field name="payment_state" optional="show"/>
                     <field name="state"/>
                 </list>
             </field>
@@ -67,7 +66,6 @@
                             <group>
                                 <field name="vendor_bill_id" readonly="1"/>
                                 <field name="vendor_bill_state" readonly="1"/>
-                                <field name="payment_state" readonly="1"/>
                             </group>
                         </group>
                         <notebook>
@@ -104,7 +102,6 @@
                     <field name="total_delivery_fees"/>
                     <field name="net_amount_due"/>
                     <field name="vendor_bill_state" optional="show"/>
-                    <field name="payment_state" optional="show"/>
                     <field name="state"/>
                 </list>
             </field>
@@ -157,7 +154,6 @@
                             <group>
                                 <field name="vendor_bill_id" readonly="1"/>
                                 <field name="vendor_bill_state" readonly="1"/>
-                                <field name="payment_state" readonly="1"/>
                             </group>
                         </group>
                         <notebook>
@@ -234,7 +230,6 @@
                                         <field name="total_deliveries"/>
                                         <field name="total_amount_due"/>
                                         <field name="vendor_bill_state"/>
-                                        <field name="payment_state"/>
                                         <field name="state"/>
                                     </list>
                                 </field>

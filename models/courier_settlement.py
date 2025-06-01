@@ -38,7 +38,6 @@ class CourierSettlement(models.Model):
     # Vendor bill integration
     vendor_bill_id = fields.Many2one('account.move', 'Vendor Bill', readonly=True)
     vendor_bill_state = fields.Selection(related='vendor_bill_id.state', string='Bill Status', readonly=True)
-    payment_state = fields.Selection(related='vendor_bill_id.payment_state', string='Payment Status', readonly=True)
 
     # Settlement lines
     settlement_line_ids = fields.One2many('food.delivery.courier.settlement.line', 'settlement_id', 'Settlement Lines',
