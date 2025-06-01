@@ -25,13 +25,11 @@ class CourierSettlement(models.Model):
     high_volume_deliveries = fields.Integer('High Volume Deliveries')
     regular_deliveries = fields.Integer('Regular Deliveries')
 
-    # Workflow states - simplified to track vendor bill status
     state = fields.Selection([
-        ('generated', 'Settlement Generated'),
-        ('bill_created', 'Vendor Bill Created'),
+        ('awaiting_payment', 'Awaiting Payment'),
         ('paid', 'Paid'),
         ('cancelled', 'Cancelled')
-    ], default='generated', required=True, tracking=True, readonly=True)
+    ], compute='_compute_settlement_state', default='awaiting_payment', required=True, tracking=True)
 
     # Creation tracking
     created_by = fields.Many2one('res.users', 'Created By', readonly=True, default=lambda self: self.env.user)
@@ -59,21 +57,16 @@ class CourierSettlement(models.Model):
                 record.name = "New Settlement"
 
     @api.depends('vendor_bill_id.state', 'vendor_bill_id.payment_state')
-    def _compute_payment_status(self):
+    def _compute_settlement_state(self):
         for record in self:
-            if record.vendor_bill_id:
-                record.can_be_paid = record.vendor_bill_id.state == 'posted' and record.vendor_bill_id.payment_state in [
-                    'not_paid', 'partial']
-                record.is_paid = record.vendor_bill_id.payment_state == 'paid'
-
-                # Update settlement state based on vendor bill status
-                if record.is_paid and record.state != 'paid':
-                    record.state = 'paid'
-                elif record.vendor_bill_id.state == 'cancel' and record.state != 'cancelled':
-                    record.state = 'cancelled'
+            if not record.vendor_bill_id:
+                record.state = 'awaiting_payment'
+            elif record.vendor_bill_id.state == 'cancel':
+                record.state = 'cancelled'
+            elif record.vendor_bill_id.payment_state == 'paid':
+                record.state = 'paid'
             else:
-                record.can_be_paid = False
-                record.is_paid = False
+                record.state = 'awaiting_payment'
 
     @api.model
     def create(self, vals):

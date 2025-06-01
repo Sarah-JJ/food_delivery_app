@@ -7,9 +7,7 @@
             <field name="name">courier.settlement.tree</field>
             <field name="model">food.delivery.courier.settlement</field>
             <field name="arch" type="xml">
-                <list create="false" edit="false" delete="false"
-                      decoration-info="state=='generated'" decoration-muted="state=='bill_created'"
-                      decoration-success="state=='paid'" decoration-danger="state=='cancelled'">
+                <list create="false" edit="false" delete="false">
                     <field name="name"/>
                     <field name="courier_id"/>
                     <field name="settlement_date"/>
@@ -33,7 +31,7 @@
                         <button name="action_view_vendor_bill" type="object"
                                 string="View Vendor Bill" class="oe_highlight"
                                 invisible="[('vendor_bill_id', '=', False)]"/>
-                        <field name="state" widget="statusbar" statusbar_visible="generated,bill_created,paid"/>
+                        <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
@@ -105,9 +103,7 @@
             <field name="name">restaurant.settlement.tree</field>
             <field name="model">food.delivery.restaurant.settlement</field>
             <field name="arch" type="xml">
-                <list create="false" edit="false" delete="false"
-                      decoration-info="state=='generated'" decoration-muted="state=='bill_created'"
-                      decoration-success="state=='paid'" decoration-danger="state=='cancelled'">
+                <list create="false" edit="false" delete="false">
                     <field name="name"/>
                     <field name="restaurant_id"/>
                     <field name="settlement_date"/>
@@ -133,7 +129,7 @@
                         <button name="action_view_vendor_bill" type="object"
                                 string="View Vendor Bill" class="oe_highlight"
                                 invisible="[('vendor_bill_id', '=', False)]"/>
-                        <field name="state" widget="statusbar" statusbar_visible="generated,bill_created,paid"/>
+                        <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
